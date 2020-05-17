@@ -109,7 +109,7 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
-     '''
+    '''
     Save model as a pickle file 
     Input: 
         model: Model to be saved
@@ -118,6 +118,8 @@ def save_model(model, model_filepath):
         A pickle file of saved model
     '''
     pickle.dump(model, open(model_filepath, 'wb'))
+  
+    
 
 
 def main():
