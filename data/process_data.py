@@ -4,6 +4,13 @@ import numpy as np
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    '''
+    Input:
+        messages_filepath: File path of messages data
+        categories_filepath: File path of categories data
+    Output:
+        df: Merged dataset from messages and categories
+    '''
     messages = pd.read_csv(messages_filepath)
     categories =pd.read_csv(categories_filepath) 
     df = messages.merge(categories,on='id')
@@ -11,6 +18,12 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    '''
+    Input:
+        df: Merged dataset from messages and categories
+    Output:
+        df: Cleaned dataset
+    '''
     categories = df['categories'].str.split(pat=";",n=-1,expand=True)
     # select the first row of the categories dataframe
     row = categories.loc[1,:]
@@ -25,7 +38,9 @@ def clean_data(df):
         categories[column] = categories[column].str[-1:]
         # convert column from string to numeric
         categories[column] = categories[column].astype(int)
+    # Drop the original categories column
     df=df.drop('categories',axis=1)
+    # Concatenate the original dataframe with the new categories dataframe
     df = pd.concat([df,categories],axis=1)
     df.drop_duplicates(inplace=True)
     return df
@@ -33,6 +48,14 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    '''
+    Save df into sqlite db
+    Input:
+        df: cleaned dataset
+        database_filename: database name, e.g. DisasterMessages.db
+    Output: 
+        A SQLite database
+    '''
     engine = create_engine('sqlite:///'+ database_filename)
     df.to_sql('DisasterMessages', engine, index=False, if_exists='replace') 
 

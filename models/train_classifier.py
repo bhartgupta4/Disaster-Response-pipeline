@@ -23,6 +23,15 @@ from sklearn.pipeline import Pipeline,FeatureUnion
 import pickle
 
 def load_data(database_filepath):
+    '''
+    Load data from database as dataframe
+    Input:
+        database_filepath: File path of sql database
+    Output:
+        X: Message data (features)
+        Y: Categories (target)
+        category_names: Labels for 36 categories
+    '''
     engine = create_engine('sqlite:///'+database_filepath)
     table_name = database_filepath[:-3]
     table=table_name.split('/')
@@ -35,6 +44,13 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    '''
+    Tokenize and clean text
+    Input:
+        text: original message text
+    Output:
+        lemmed: Tokenized, cleaned, and lemmatized text
+    '''
     url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
     detected_url=re.findall(url_regex,text)
     for url in detected_url:
@@ -51,6 +67,12 @@ def tokenize(text):
 
     
 def build_model():
+    '''
+    Build a ML pipeline using ifidf, random forest and multioutputclassifier, and gridsearch
+    Input: None
+    Output:
+        Results of GridSearchCV
+    '''
     clsi = MultiOutputClassifier(RandomForestClassifier())
 
     pipeline = Pipeline([
@@ -62,12 +84,22 @@ def build_model():
     parameters = {'clf__estimator__max_depth': [None,10,50],
                   'tfidf__smooth_idf':[True,False],
               'clf__estimator__min_samples_leaf':[1, 5, 20]}
-
+    #initializing the grid search
     cv = GridSearchCV(pipeline, parameters)
     return cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''
+    Evaluate model performance using test data
+    Input: 
+        model: Model to be evaluated
+        X_test: Test data (features)
+        Y_test: True lables for Test data
+        category_names: Labels for 36 categories
+    Output:
+        Print accuracy and classfication report for each category
+    '''
     Y_pred = model.predict(X_test)
     for i in range(len(category_names)):
         print("Category:", category_names[i],"\n", classification_report(Y_test.iloc[:, i].values, Y_pred[:, i]))
@@ -77,6 +109,14 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+     '''
+    Save model as a pickle file 
+    Input: 
+        model: Model to be saved
+        model_filepath: path of the output pick file
+    Output:
+        A pickle file of saved model
+    '''
     pickle.dump(model, open(model_filepath, 'wb'))
 
 
