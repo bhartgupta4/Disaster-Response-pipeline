@@ -44,3 +44,5 @@ Apart from the files there are three folder the contents of which are
 Classification when message related to earthquake is processed
 https://github.com/bhartgupta4/Disaster-Response-pipeline/blob/master/screenshot.PNG
 
+The findings can be found here https://medium.com/@bhartlive12/building-a-disaster-response-application-26ccb13530a6
+
